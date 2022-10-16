@@ -1,20 +1,24 @@
 plugins {
     id 'java-library'
-
 }
-
 
 repositories {
     mavenCentral()
 }
+
+def restAssuredVersion = '5.2.0',
+    junitVersion = '5.9.0',
+    slf4jVersion = '2.0.3'
+
 dependencies {
     testImplementation(
-            'org.junit.jupiter:junit-jupiter-engine:5.9.1',
-            'org.slf4j:slf4j-simple:2.0.3',
+            "io.rest-assured:rest-assured:$restAssuredVersion",
+            "org.junit.jupiter:junit-jupiter:$junitVersion",
+            "org.slf4j:slf4j-simple:$slf4jVersion"
     )
 }
 
-tasks.withType(JavaCompile){
+tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
@@ -29,4 +33,3 @@ tasks.withType(Test) {
         }
     }
 }
-
