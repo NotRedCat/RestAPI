@@ -1,6 +1,5 @@
 package tests;
 
-import netscape.javascript.JSObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,11 +8,11 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
 
-public class ReqresInTests {
+public class RequestInTests {
 
     @Test
     @DisplayName("Получение информации о пользователе")
-    void SingleUserTest() {
+    void singleUserTest() {
         given()
                 .when()
                 .get("https://reqres.in/api/users/7")
@@ -28,7 +27,7 @@ public class ReqresInTests {
 
     @Test
     @DisplayName("Пользователь не найден")
-    void UserNotFoundTest() {
+    void userNotFoundTest() {
         given()
                 .when()
                 .get("https://reqres.in/api/users/45")
@@ -40,7 +39,7 @@ public class ReqresInTests {
 
     @Test
     @DisplayName("Создание нового пользователя")
-    void CreateUserTest() {
+    void createUserTest() {
         String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
         given()
                 .log().body()
@@ -63,7 +62,7 @@ public class ReqresInTests {
             "Тут я ожидала, что возникнет какая-нибудь ошибка, но пустой пользователь сохранился." +
             "Думаю это полезный тест, чтобы понять, что в базу сохраняются пустые пользователи, " +
             "и нужно это исправлять")
-    void CreateEmptyUserTest() {
+    void createEmptyUserTest() {
         String body = "{}";
         given()
                 .log().body()
@@ -79,7 +78,7 @@ public class ReqresInTests {
 
     @Test
     @DisplayName("Изменение существующего пользователя")
-    void ChangeUserTest() {
+    void changeUserTest() {
         String body1 = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
         String body2 = "{ \"name\": \"Jim\", \"job\": \"driver\" }";
 
@@ -114,7 +113,7 @@ public class ReqresInTests {
 
     @Test
     @DisplayName("Удаление пользователя")
-    void DeleteUserTest() {
+    void deleteUserTest() {
         String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
         var id = given()
                 .log().body()
