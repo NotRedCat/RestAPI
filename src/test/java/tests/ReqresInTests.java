@@ -1,6 +1,7 @@
 package tests;
 
 import netscape.javascript.JSObject;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +15,6 @@ public class ReqresInTests {
     @DisplayName("Получение информации о пользователе")
     void SingleUserTest() {
         given()
-                .log().uri()
-                .log().body()
                 .when()
                 .get("https://reqres.in/api/users/7")
                 .then()
@@ -31,8 +30,6 @@ public class ReqresInTests {
     @DisplayName("Пользователь не найден")
     void UserNotFoundTest() {
         given()
-                .log().uri()
-                .log().body()
                 .when()
                 .get("https://reqres.in/api/users/45")
                 .then()
@@ -46,7 +43,6 @@ public class ReqresInTests {
     void CreateUserTest() {
         String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
         given()
-                .log().uri()
                 .log().body()
                 .contentType(JSON)
                 .body(body)
@@ -58,9 +54,10 @@ public class ReqresInTests {
                 .statusCode(201)
                 .body("name", is("Jack"))
                 .body("job", is("teacher"));
-    }
 
- /*   @Test
+    }
+@Disabled
+   @Test
     @DisplayName("Создание пустого пользователя" +
             "Тут я ожидала, что возникнет какая-нибудь ошибка, но пустой пользователь сохранился." +
             "Думаю это полезный тест, чтобы понять, что в базу сохраняются пустые пользователи, " +
@@ -68,7 +65,6 @@ public class ReqresInTests {
     void CreateEmptyUserTest() {
         String body = "{}";
         given()
-                .log().uri()
                 .log().body()
                 .contentType(JSON)
                 .body(body)
@@ -78,39 +74,75 @@ public class ReqresInTests {
                 .log().status()
                 .log().body()
                 .statusCode(400);
-    }*/
+    }
 
     @Test
     @DisplayName("Изменение существующего пользователя")
     void ChangeUserTest() {
-        String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
-        given()
-                .log().uri()
+        String body1 = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
+        String body2 = "{ \"name\": \"Jim\", \"job\": \"driver\" }";
+
+        var id = given()
                 .log().body()
                 .contentType(JSON)
-                .body(body)
+                .body(body1)
                 .when()
-                .put("https://reqres.in/api/user/2")
+                .post("https://reqres.in/api/users")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(201)
+                .body("name", is("Jack"))
+                .body("job", is("teacher"))
+                .extract()
+                .response()
+                .path("id");
+        given()
+                .log().body()
+                .contentType(JSON)
+                .body(body2)
+                .when()
+                .put("https://reqres.in/api/user/"+id)
                 .then()
                 .log().status()
                 .log().body()
                 .statusCode(200)
-                .body("name", is("Jack"))
-                .body("job", is("teacher"));
+                .body("name", is("Jim"))
+                .body("job", is("driver"));
     }
 
     @Test
     @DisplayName("Удаление пользователя")
     void DeleteUserTest() {
+        String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
+        var id = given()
+                .log().body()
+                .contentType(JSON)
+                .body(body)
+                .when()
+                .post("https://reqres.in/api/users")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(201)
+                .extract()
+                .response()
+                .path("id");
         given()
-                .log().uri()
                 .log().body()
                 .when()
-                .delete("https://reqres.in/api/users/8")
+                .delete("https://reqres.in/api/users/" + id)
                 .then()
                 .log().status()
                 .log().body()
                 .statusCode(204);
+        given()
+                .when()
+                .get("https://reqres.in/api/users/"+id)
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
     }
 
 }
