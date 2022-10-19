@@ -56,8 +56,9 @@ public class ReqresInTests {
                 .body("job", is("teacher"));
 
     }
-@Disabled
-   @Test
+
+    @Disabled
+    @Test
     @DisplayName("Создание пустого пользователя" +
             "Тут я ожидала, что возникнет какая-нибудь ошибка, но пустой пользователь сохранился." +
             "Думаю это полезный тест, чтобы понять, что в базу сохраняются пустые пользователи, " +
@@ -102,7 +103,7 @@ public class ReqresInTests {
                 .contentType(JSON)
                 .body(body2)
                 .when()
-                .put("https://reqres.in/api/user/"+id)
+                .put("https://reqres.in/api/user/" + id)
                 .then()
                 .log().status()
                 .log().body()
@@ -138,7 +139,7 @@ public class ReqresInTests {
                 .statusCode(204);
         given()
                 .when()
-                .get("https://reqres.in/api/users/"+id)
+                .get("https://reqres.in/api/users/" + id)
                 .then()
                 .log().status()
                 .log().body()

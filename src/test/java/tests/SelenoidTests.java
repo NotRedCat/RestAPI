@@ -69,22 +69,24 @@ public class SelenoidTests {
                 .extract()
                 .path("total");
     }
-       /*
-     1. make request to https://selenoid.autotests.cloud/wd/hub/status
-     2. get response {"value":{"message":"Selenoid 1.10.7 built at 2021-11-21_05:46:32AM","ready":true}}
-     3. check value.ready is true
-  */
-       @Test
-       void checkWDStatus() {
-           given()
-                   .log().uri()
-                   .when()
-                   .get("https://selenoid.autotests.cloud/wd/hub/status")
-                   .then()
-                   .log().status()
-                   .log().body()
-                   .statusCode(401);
-       }
+
+    /*
+  1. make request to https://selenoid.autotests.cloud/wd/hub/status
+  2. get response {"value":{"message":"Selenoid 1.10.7 built at 2021-11-21_05:46:32AM","ready":true}}
+  3. check value.ready is true
+*/
+    @Test
+    void checkWDStatus() {
+        given()
+                .log().uri()
+                .when()
+                .get("https://selenoid.autotests.cloud/wd/hub/status")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(401);
+    }
+
     @Test
     void checkWDTotal() {
         given()
@@ -97,10 +99,11 @@ public class SelenoidTests {
                 .statusCode(200)
                 .body("value.ready", is(true));
     }
+
     @Test
     void checkWDHubStatus() {
         given()
-                .auth().basic("user1","1234")
+                .auth().basic("user1", "1234")
                 .log().uri()
                 .when()
                 .get("https://selenoid.autotests.cloud/wd/hub/status")
