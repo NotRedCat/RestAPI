@@ -84,8 +84,6 @@ public class RequestInTests {
     @Test
     @DisplayName("Изменение существующего пользователя")
     void changeUserTest() {
-        //String body1 = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
-        // String body2 = "{ \"name\": \"Jim\", \"job\": \"driver\" }";
         UserLombokModel body1 = new UserLombokModel();
         UserLombokModel body2 = new UserLombokModel();
         body1.setName1("Jack");
@@ -119,10 +117,10 @@ public class RequestInTests {
     @Test
     @DisplayName("Удаление пользователя")
     void deleteUserTest() {
-        UserLombokModel body = new UserLombokModel();
-        body.setName1("Jack");
-        body.setJob1("teacher");
-        ResponseLombokModel response = given()
+        UserPojoModel body = new UserPojoModel();
+        body.setName("Jack");
+        body.setJob("teacher");
+        ResponsePojoModel response = given()
                 .spec(testRequestSpec)
                 .body(body)
                 .when()
@@ -130,7 +128,7 @@ public class RequestInTests {
                 .then()
                 .spec(testResponseSpec201)
                 .extract()
-                .as(ResponseLombokModel.class);
+                .as(ResponsePojoModel.class);
         given()
                 .spec(testRequestSpec)
                 .when()

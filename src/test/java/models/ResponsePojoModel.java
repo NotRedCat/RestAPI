@@ -1,7 +1,8 @@
 package models;
 
 public class ResponsePojoModel {
-    private String name, job, last_name, first_name;
+    private Integer id;
+    private String name, job;
 
     public String getName() {
         return name;
@@ -9,6 +10,14 @@ public class ResponsePojoModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getJob() {
