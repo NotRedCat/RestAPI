@@ -31,15 +31,15 @@ public class TestSpecs {
             .log(LogDetail.BODY)
             .build();
 
-public static ResponseSpecification testResponseSpec204 = new ResponseSpecBuilder()
-        .expectStatusCode(204)
-        .log(LogDetail.STATUS)
-        .log(LogDetail.BODY)
-        .build();
+    public static ResponseSpecification testResponseSpec204 = new ResponseSpecBuilder()
+            .expectStatusCode(204)
+            .log(LogDetail.STATUS)
+            .log(LogDetail.BODY)
+            .build();
 
     public static ResponseSpecification testResponseSpec404 = new ResponseSpecBuilder()
             .expectStatusCode(404)
             .log(LogDetail.STATUS)
             .log(LogDetail.BODY)
             .build();
-        }
+}

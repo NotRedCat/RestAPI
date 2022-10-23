@@ -1,7 +1,7 @@
 package models;
 
 public class ResponsePojoModel {
-    private String name,job,last_name,first_name;
+    private String name, job, last_name, first_name;
 
     public String getName() {
         return name;

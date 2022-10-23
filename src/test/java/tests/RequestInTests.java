@@ -122,7 +122,6 @@ public class RequestInTests {
         UserLombokModel body = new UserLombokModel();
         body.setName1("Jack");
         body.setJob1("teacher");
-        // String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
         ResponseLombokModel response = given()
                 .spec(testRequestSpec)
                 .body(body)
@@ -139,6 +138,7 @@ public class RequestInTests {
                 .then()
                 .spec(testResponseSpec204);
         given()
+                .spec(testRequestSpec)
                 .when()
                 .get("https://reqres.in/api/users/" + response.getId())
                 .then()

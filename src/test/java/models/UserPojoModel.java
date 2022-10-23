@@ -2,21 +2,13 @@ package models;
 
 public class UserPojoModel {
     private String name,
-    job;
+            job;
 
-    public String getName(){
-        return name;
-    }
-
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getJob(){
-        return job;
-    }
-
-    public void setJob(String job){
+    public void setJob(String job) {
         this.job = job;
     }
 }
