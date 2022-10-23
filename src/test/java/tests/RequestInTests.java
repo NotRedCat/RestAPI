@@ -1,55 +1,64 @@
 package tests;
 
 import models.ResponseLombokModel;
-import models.ResponsePojoModel;
-import models.UserLombokModel;
-import models.UserPojoModel;
-import org.junit.jupiter.api.Disabled;
+import models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import specs.TestSpecs;
+import org.json.JSONObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static specs.TestSpecs.*;
 
 public class RequestInTests {
 
     @Test
-    @DisplayName("Получение информации о пользователе")
+    @DisplayName("Проверка, что пользователь с почтой eve.holt@reqres.in есть в списке")
     void singleUserTest() {
         given()
                 .spec(testRequestSpec)
                 .when()
-                .get("/api/users/7")
+                .get("/api/users")
                 .then()
                 .spec(testResponseSpec200)
-                .body("data.first_name", is("Michael"))
-                .body("data.last_name", is("Lawson"));
+                .body("data.findAll{it.email =~/.*?@reqres.in/}.email.flatten()",
+                        hasItem("eve.holt@reqres.in"));
+    }
+    @Test
+    @DisplayName("Проверка, что пользователь с Emma есть в списке пользователей")
+    void singleUserNameTest() {
+        given()
+                .spec(testRequestSpec)
+                .when()
+                .get("/api/users")
+                .then()
+                .spec(testResponseSpec200)
+                .body("data.findAll{it.first_name}.first_name.flatten()",
+                        hasItem("Emma"));
     }
 
-
     @Test
-    @DisplayName("Пользователь не найден")
+    @DisplayName("Пользователя с id = 45, не существует")
     void userNotFoundTest() {
 
         given()
                 .spec(testRequestSpec)
                 .when()
-                .get("/users/45")
+                .get("/api/users")
                 .then()
-                .spec(testResponseSpec404);
+                .spec(testResponseSpec200)
+                .body("data.findAll{it.id!=null}.id.flatten()",
+                        not(hasItem(45)));
     }
 
     @Test
     @DisplayName("Создание нового пользователя")
     void createUserTest() {
-        UserPojoModel body = new UserPojoModel();
+        User body = new User();
         body.setName("Jack");
         body.setJob("teacher");
-        ResponsePojoModel response = given()
+        ResponseLombokModel response = given()
                 .spec(testRequestSpec)
                 .body(body)
                 .when()
@@ -57,39 +66,20 @@ public class RequestInTests {
                 .then()
                 .spec(testResponseSpec201)
                 .extract()
-                .as(ResponsePojoModel.class);
-
+                .as(ResponseLombokModel.class);
+        assertThat(response.getName()).isEqualTo(body.getName());
     }
 
-    @Disabled
-    @Test
-    @DisplayName("Создание пустого пользователя" +
-            "Тут я ожидала, что возникнет какая-нибудь ошибка, но пустой пользователь сохранился." +
-            "Думаю это полезный тест, чтобы понять, что в базу сохраняются пустые пользователи, " +
-            "и нужно это исправлять")
-    void createEmptyUserTest() {
-        String body = "{}";
-        given()
-                .log().body()
-                .contentType(JSON)
-                .body(body)
-                .when()
-                .post("https://reqres.in/api/users")
-                .then()
-                .log().status()
-                .log().body()
-                .statusCode(400);
-    }
 
     @Test
     @DisplayName("Изменение существующего пользователя")
     void changeUserTest() {
-        UserLombokModel body1 = new UserLombokModel();
-        UserLombokModel body2 = new UserLombokModel();
-        body1.setName1("Jack");
-        body1.setJob1("teacher");
-        body2.setName2("Jim");
-        body2.setJob2("driver");
+        User body1 = new User();
+        User body2 = new User();
+        body1.setName("Jack");
+        body1.setJob("teacher");
+        body2.setNewName("Jim");
+        body2.setNewJob("driver");
         ResponseLombokModel response = given()
                 .spec(testRequestSpec)
                 .body(body1)
@@ -99,8 +89,8 @@ public class RequestInTests {
                 .spec(testResponseSpec201)
                 .extract()
                 .as(ResponseLombokModel.class);
-        assertThat(response.getName1()).isEqualTo(body1.getName1());
-        assertThat(response.getJob1()).isEqualTo(body1.getJob1());
+        assertThat(response.getName()).isEqualTo(body1.getName());
+        assertThat(response.getName()).isEqualTo(body1.getJob());
         ResponseLombokModel response2 = given()
                 .spec(testRequestSpec)
                 .body(body2)
@@ -110,17 +100,17 @@ public class RequestInTests {
                 .spec(testResponseSpec200)
                 .extract()
                 .as(ResponseLombokModel.class);
-        assertThat(response2.getName2()).isEqualTo(body2.getName2());
-        assertThat(response2.getJob2()).isEqualTo(body2.getJob2());
+        assertThat(response2.getNewName()).isEqualTo(body2.getNewName());
+        assertThat(response2.getNewJob()).isEqualTo(body2.getNewJob());
     }
 
     @Test
     @DisplayName("Удаление пользователя")
     void deleteUserTest() {
-        UserPojoModel body = new UserPojoModel();
+        User body = new User();
         body.setName("Jack");
         body.setJob("teacher");
-        ResponsePojoModel response = given()
+        ResponseLombokModel response = given()
                 .spec(testRequestSpec)
                 .body(body)
                 .when()
@@ -128,7 +118,7 @@ public class RequestInTests {
                 .then()
                 .spec(testResponseSpec201)
                 .extract()
-                .as(ResponsePojoModel.class);
+                .as(ResponseLombokModel.class);
         given()
                 .spec(testRequestSpec)
                 .when()
