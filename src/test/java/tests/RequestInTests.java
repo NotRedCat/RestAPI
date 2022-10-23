@@ -1,12 +1,19 @@
 package tests;
 
+import models.ResponseLombokModel;
+import models.ResponsePojoModel;
+import models.UserLombokModel;
+import models.UserPojoModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import specs.TestSpecs;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
+import static specs.TestSpecs.*;
 
 public class RequestInTests {
 
@@ -14,12 +21,11 @@ public class RequestInTests {
     @DisplayName("Получение информации о пользователе")
     void singleUserTest() {
         given()
+                .spec(testRequestSpec)
                 .when()
-                .get("https://reqres.in/api/users/7")
+                .get("/api/users/7")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
+                .spec(testResponseSpec200)
                 .body("data.first_name", is("Michael"))
                 .body("data.last_name", is("Lawson"));
     }
@@ -28,31 +34,30 @@ public class RequestInTests {
     @Test
     @DisplayName("Пользователь не найден")
     void userNotFoundTest() {
+
         given()
+                .spec(testRequestSpec)
                 .when()
-                .get("https://reqres.in/api/users/45")
+                .get("/users/45")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(404);
+                .spec(testResponseSpec404);
     }
 
     @Test
     @DisplayName("Создание нового пользователя")
     void createUserTest() {
-        String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
-        given()
-                .log().body()
-                .contentType(JSON)
+        UserPojoModel body = new UserPojoModel();
+        body.setName("Jack");
+        body.setJob("teacher");
+        ResponsePojoModel response = given()
+                .spec(testRequestSpec)
                 .body(body)
                 .when()
-                .post("https://reqres.in/api/users")
+                .post("/api/users")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(201)
-                .body("name", is("Jack"))
-                .body("job", is("teacher"));
+                .spec(testResponseSpec201)
+                .extract()
+                .as(ResponsePojoModel.class);
 
     }
 
@@ -79,70 +84,65 @@ public class RequestInTests {
     @Test
     @DisplayName("Изменение существующего пользователя")
     void changeUserTest() {
-        String body1 = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
-        String body2 = "{ \"name\": \"Jim\", \"job\": \"driver\" }";
-
-        var id = given()
-                .log().body()
-                .contentType(JSON)
+        //String body1 = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
+        // String body2 = "{ \"name\": \"Jim\", \"job\": \"driver\" }";
+        UserLombokModel body1 = new UserLombokModel();
+        UserLombokModel body2 = new UserLombokModel();
+        body1.setName1("Jack");
+        body1.setJob1("teacher");
+        body2.setName2("Jim");
+        body2.setJob2("driver");
+        ResponseLombokModel response = given()
+                .spec(testRequestSpec)
                 .body(body1)
                 .when()
                 .post("https://reqres.in/api/users")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(201)
-                .body("name", is("Jack"))
-                .body("job", is("teacher"))
+                .spec(testResponseSpec201)
                 .extract()
-                .response()
-                .path("id");
-        given()
-                .log().body()
-                .contentType(JSON)
+                .as(ResponseLombokModel.class);
+        assertThat(response.getName1()).isEqualTo(body1.getName1());
+        assertThat(response.getJob1()).isEqualTo(body1.getJob1());
+        ResponseLombokModel response2 = given()
+                .spec(testRequestSpec)
                 .body(body2)
                 .when()
-                .put("https://reqres.in/api/user/" + id)
+                .put("https://reqres.in/api/user/" + response.getId())
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
-                .body("name", is("Jim"))
-                .body("job", is("driver"));
+                .spec(testResponseSpec200)
+                .extract()
+                .as(ResponseLombokModel.class);
+        assertThat(response2.getName2()).isEqualTo(body2.getName2());
+        assertThat(response2.getJob2()).isEqualTo(body2.getJob2());
     }
 
     @Test
     @DisplayName("Удаление пользователя")
     void deleteUserTest() {
-        String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
-        var id = given()
-                .log().body()
-                .contentType(JSON)
+        UserLombokModel body = new UserLombokModel();
+        body.setName1("Jack");
+        body.setJob1("teacher");
+        // String body = "{ \"name\": \"Jack\", \"job\": \"teacher\" }";
+        ResponseLombokModel response = given()
+                .spec(testRequestSpec)
                 .body(body)
                 .when()
                 .post("https://reqres.in/api/users")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(201)
+                .spec(testResponseSpec201)
                 .extract()
-                .response()
-                .path("id");
+                .as(ResponseLombokModel.class);
         given()
-                .log().body()
+                .spec(testRequestSpec)
                 .when()
-                .delete("https://reqres.in/api/users/" + id)
+                .delete("https://reqres.in/api/users/" + response.getId())
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(204);
+                .spec(testResponseSpec204);
         given()
                 .when()
-                .get("https://reqres.in/api/users/" + id)
+                .get("https://reqres.in/api/users/" + response.getId())
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(404);
+                .spec(testResponseSpec404);
     }
 
 }
